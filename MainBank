@@ -1,0 +1,143 @@
+import java.util.Map;
+import java.util.Scanner;
+import java.util.HashMap;
+
+public class MainBank {
+	private static Map<String, BankAccount> accounts = new HashMap<String, BankAccount>();
+	
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		int idOption = 0;
+		while (idOption != 5) {
+			System.out.println("Bobby's Bank");
+			System.out.println("What would you like to do?");
+			System.out.println("1) Enter Account \n2) Create Account \n3) Delete Existing Account \n4) Edit Account ID and Password \n5) Exit");
+			idOption = input.nextInt();
+
+			switch (idOption) {
+			case 1: // Access Account
+				String userId = login();
+				if (userId != null) {
+					System.out.println("Welcome " + userId + "!");
+					BankAccount account = accounts.get(userId);
+					int bankOption = 0;
+					while (bankOption != 3) {
+						// Starting Screen
+						System.out.println("What do you want to do? \n1) Deposit \n2) Withdraw \n3) Exit");
+						bankOption = input.nextInt();
+
+						switch (bankOption) {
+						case 1:
+							System.out.println("Enter Deposit Amount: ");
+							account.deposit(input.nextInt());
+							System.out.println("Your Current Balance is: " + account.getMoneyAmount());
+							System.out.println("____________________________________________________");
+							break;
+						case 2:
+							System.out.println("Enter Withdrawal Amount: ");
+							account.withdraw(input.nextInt());
+							System.out.println("Your Current Balance is: " + account.getMoneyAmount());
+							System.out.println("____________________________________________________");
+							break;
+						case 3:
+							System.out.println("Exited!");
+							System.out.println("____________________________________________________");
+							break;
+						}
+					}
+				}
+				break;
+			case 2: // Create Account
+				System.out.println("Enter ID: ");
+				userId = input.next();
+				while (accounts.containsKey(userId)) {
+					System.out.println("ID Taken. Please try another.");
+					userId = input.next();
+				}
+				System.out.println("Enter Password: ");
+				String userPass = input.next();
+				accounts.put(userId, new BankAccount(userId, userPass));
+				System.out.println("Acccount created: " + userId + ", " + userPass);
+				System.out.println("____________________________________________________");
+				break;
+			case 3: // Delete Account
+				userId = login();
+				if (userId != null) {
+					System.out.println("Confirm to delete this account(Y/N)");
+					if (input.next().equals("Y")) {
+						accounts.remove(userId);
+						System.out.println("Account Removed!");
+					} else {
+						System.out.println("Bye!");
+					}
+				}
+				System.out.println("____________________________________________________");
+				break;
+			case 4:
+				userId = login();
+				if (userId != null) {
+					System.out.println("Enter New Password: ");
+					userPass = input.next();
+					System.out.println("Confirm to change this account(Y/N)");
+					if (input.next().equals("Y")) {
+						accounts.replace(userId, new BankAccount(userId, userPass));
+						System.out.println("Account Changed!");
+					} else {
+						System.out.println("Bye!");
+					}
+					System.out.println("____________________________________________________");
+				}
+				break;
+			case 5:
+				System.out.println("Exited!");
+				System.out.println("____________________________________________________");
+				break;
+			}
+		}
+	}
+
+	private static String login() {
+		Scanner input = new Scanner(System.in);
+		System.out.println("Enter Account ID: ");
+		String userId = input.next();
+		if (!accounts.containsKey(userId)) {
+			System.out.println("Sorry! Can't find your account");
+			return null;
+		}
+		System.out.println("Enter Account Password: ");
+		String userPass = input.next();
+		if (!userPass.equals(accounts.get(userId).getUserPass())) {
+			System.out.println("Login Failed");
+			return null;
+		}
+		return userId;
+	}
+
+	private static class BankAccount {
+		private String userId;
+		private String userPass;
+		private int moneyAmount;
+
+		BankAccount(String userId, String userPass) {
+			this.userId = userId;
+			this.userPass = userPass;
+			moneyAmount = 0;
+		}
+
+		String getUserPass() {
+			return userPass;
+		}
+
+		void deposit(int amount) {
+			moneyAmount += amount;
+		}
+
+		void withdraw(int amount) {
+			moneyAmount -= amount;
+		}
+
+		int getMoneyAmount() {
+			return moneyAmount;
+		}
+	}
+}
